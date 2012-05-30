@@ -28,6 +28,7 @@ Observable Extensions
 *knockout-postbox* augments **observables**, **observableArrays**, and **computed observables** to be able to automatically participate in sending and receiving messages through `ko.postbox`.
 
 **subscribeTo** *- subscribeTo(topic, [initializeWithLatestValue], [filter])*
+
 The `subscribeTo` function tells an observable to automatically update itself whenever it receives a message on a topic.
 
 ```js
@@ -50,6 +51,7 @@ this.topic = ko.observable().subscribeTo("mytopic", true, transform);
 
 
 **unsubscribeFrom** *- unsubscribeFrom(topic)*
+
 The `unsubscribeFrom` function removes the subscription that an observable has on a topic.
 
 ```js
@@ -58,6 +60,7 @@ this.topic = ko.observable().unsubscribeFrom("mytopic");
 
 
 **publishOn** *- publishOn(topic, [skipInitialPublish], [equalityComparer])*
+
 The `publishOn` function tells an observable to automatically publish its value on a topic whenever it changes. By default, it will only publish when the new value is not the same (`===`) as the previous value.
 
 ```js
@@ -80,10 +83,12 @@ this.topic = ko.observable(value).publishOn("mytopic", true, comparer);
 
 
 **stopPublishingOn** *- stopPublishingOn(topic)*
+
 The `stopPublishingOn` function removes the subscription used to automatically publish changes to the observable.
 
 
 **syncWith** *- syncWith(topic, [initializeWithLatestValue], [skipInitialPublish], [equalityComparer])*
+
 The `syncWith` function tells an observable to both subscribe and publish on a topic. This allows observables in two different view models to stay in sync with each other without having direct knowledge of its counterpart.
 
 ```js
@@ -92,6 +97,7 @@ this.topic = ko.observable(value).syncWith("mytopic");
 ```
 
 **ko.postbox.defaultComparer**
+
 The default comparison done to determine if a value should be published simply uses `===`. At run-time you can supply your own default comparison function by overriding `ko.postbox.defaultComparer`.
 
 Dependencies
