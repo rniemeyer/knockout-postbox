@@ -2,6 +2,8 @@ knockout-postbox
 ================
 *knockout-postbox* is a [Knockout.js](http://knockoutjs.com/) plugin designed to use Knockout's basic pub/sub capabilities to facilitate decoupled communication between separate view models / components.
 
+More background here: http://www.knockmeout.net/2012/05/using-ko-native-pubsub.html
+
 Basic Usage
 -----------
 
