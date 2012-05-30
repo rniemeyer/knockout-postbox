@@ -7,7 +7,7 @@ More background here: http://www.knockmeout.net/2012/05/using-ko-native-pubsub.h
 Basic Usage
 -----------
 
-*knockout-postbox* creates a `ko.postbox` object that can be used for basic pub/sub communication. However, typically you would use the observable extensions rather than calling `ko.postbox` directly.
+*knockout-postbox* creates a `ko.postbox` object that can be used for basic pub/sub communication. However, typically you would use the observable extensions rather than calling the `ko.postbox` APIs directly, unless you are integrating with a non-KO component.
 
 **subscribe** *- ko.postbox.subscribe(topic, handler, target)*
 
