@@ -1,3 +1,4 @@
+//knockout-postbox v0.1.0 | (c) 2012 Ryan Niemeyer | http://www.opensource.org/licenses/mit-license
 (function(ko, undefined) {
     var disposeTopicSubscription, existingSubscribe;
 
