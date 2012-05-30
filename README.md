@@ -27,7 +27,7 @@ Observable Extensions
 
 *knockout-postbox* augments **observables**, **observableArrays**, and **computed observables** to be able to automatically participate in sending and receiving messages through `ko.postbox`.
 
-**subscribeTo** *- subscribeTo(topic, [initializeWithLatestValue], [filter])*
+**subscribeTo** *- subscribeTo(topic, [initializeWithLatestValue], [transform])*
 
 The `subscribeTo` function tells an observable to automatically update itself whenever it receives a message on a topic.
 
@@ -45,7 +45,7 @@ var transform = function(newValue) {
 
 this.topic = ko.observable().subscribeTo("mytopic", transform);
 
-//receive updates from "mytopic", filter updates, and initialize with the last published value
+//receive updates from "mytopic", initialize with latest published value, and send updates through transform
 this.topic = ko.observable().subscribeTo("mytopic", true, transform);
 ```
 
