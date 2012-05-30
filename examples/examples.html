@@ -1,0 +1,77 @@
+<!DOCTYPE HTML >
+<html>
+<head>
+    <title>ko.postbox example</title>
+    <link rel="stylesheet" href="bootstrap.css" />
+    <style type='text/css'>
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="menu">
+            <h2><span data-bind="text: name"></span>'s Settings</h2>
+            <ul class="nav nav-pills" data-bind="foreach: sections">
+                <li data-bind="css: { active: $root.selectedSection() === $data }">
+                    <a href="#" data-bind="text: $data, click: $root.selectedSection"></a>
+                </li>
+            </ul>
+        </div>
+
+        <div id="profile" data-bind="visible: visible">
+            <h3>Profile</h3>
+            <label>Nick name: <input id="nick" data-bind="value: nickName" /> </label>
+            <label>Email: <input data-bind="value: emailAddress" /></label>
+        </div>
+
+        <div id="notifications" data-bind="visible: visible">
+            <h3>Notifications</h3>
+            <label>Email: <input data-bind="value: emailAddress" /></label>
+            <label class="checkbox">
+                <input type="checkbox" data-bind="value: sendNotifications" /> Send Notifications?
+            </label>
+        </div>
+    </div>
+
+    <script src="../ext/knockout-2.1.0.js"></script>
+    <script src="../build/knockout-postbox.min.js"></script>
+    <script>
+        var MenuModel = function() {
+            this.name = ko.observable().subscribeTo("nickName");
+            this.sections = ["Profile", "Notifications"];
+            this.selectedSection = ko.observable().publishOn("section");
+        };
+
+        var ProfileModel = function() {
+            //publish updates to the nick name
+            this.nickName = ko.observable("Ryan").publishOn("nickName");
+
+            //apply a filter to turn the value that we receive into a boolean
+            this.visible = ko.observable().subscribeTo("section", function(newValue) {
+                return newValue === "Profile";
+            });
+
+            //subscribe and publish on the "email" topic to keep this observable in sync between view models
+            this.emailAddress = ko.observable("ryan@knockmeout.net").syncWith("email");
+        };
+
+        var NotificationsModel = function() {
+            this.visible = ko.observable(false);
+            //as an alternative, use a direct subscription on the topic to update the observable
+            ko.postbox.subscribe("section", function(newValue) {
+                this.visible(newValue === "Notifications");
+            }, this);
+
+            //subscribe and publish on the "email" topic to keep this observable in sync between view models
+            this.emailAddress = ko.observable("ryan@knockmeout.net").syncWith("email");
+
+            this.sendNotifications = ko.observable(false);
+        };
+
+        //three independent view models, that have no direct references to each other
+        ko.applyBindings(new MenuModel(), document.getElementById("menu"));
+        ko.applyBindings(new ProfileModel(), document.getElementById("profile"));
+        ko.applyBindings(new NotificationsModel(), document.getElementById("notifications"));
+    </script>
+</body>
+</html>

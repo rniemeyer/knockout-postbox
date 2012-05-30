@@ -1,0 +1,50 @@
+<html>
+<head>
+    <title>knockout-postbox spec runner</title>
+
+    <link rel="stylesheet" type="text/css" href="lib/jasmine.css">
+    <script type="text/javascript" src="lib/jasmine.js"></script>
+    <script type="text/javascript" src="lib/jasmine-html.js"></script>
+
+    <!-- dependencies -->
+    <script src="../ext/knockout-2.1.0.js" type="text/javascript"></script>
+
+    <!-- source files -->
+    <script src="../src/knockout-postbox.js" type="text/javascript"></script>
+
+    <!-- spec files  -->
+    <script type="text/javascript" src="knockout-postbox.spec.js"></script>
+
+    <script type="text/javascript">
+        (function() {
+            var jasmineEnv = jasmine.getEnv();
+            jasmineEnv.updateInterval = 1000;
+
+            var trivialReporter = new jasmine.TrivialReporter();
+
+            jasmineEnv.addReporter(trivialReporter);
+
+            jasmineEnv.specFilter = function(spec) {
+                return trivialReporter.specFilter(spec);
+            };
+
+            var currentWindowOnload = window.onload;
+
+            window.onload = function() {
+                if (currentWindowOnload) {
+                    currentWindowOnload();
+                }
+                execJasmine();
+            };
+
+            function execJasmine() {
+                jasmineEnv.execute();
+            }
+        })();
+    </script>
+
+</head>
+
+<body>
+</body>
+</html>

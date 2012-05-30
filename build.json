@@ -1,0 +1,16 @@
+{
+	"source": "src",
+	"output": "build",
+	"spec": "spec",
+	"ext": "ext",
+	"lint": {},
+	"uglify": {},
+	"gzip": false,
+	"finalize": {
+		"header": "//knockout-postbox | (c) 2012 Ryan Niemeyer | http://www.opensource.org/licenses/mit-license"
+	},
+	"hosts": {
+		"/examples": "./examples",
+		"/build": "./build"
+	}
+}
