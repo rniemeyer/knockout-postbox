@@ -74,7 +74,7 @@ this.topic = ko.observable(value).publishOn("mytopic", true);
 
 //publish changes on "mytopic" when the comparer function returns false
 var comparer = function(newValue, oldValue) {
-    return newValue > oldValue;
+    return newValue < oldValue;
 };
 
 this.topic = ko.observable(value).publishOn("mytopic", comparer);
@@ -105,6 +105,7 @@ The default comparison done to determine if a value should be published simply u
 Dependencies
 ------------
 * Knockout 2.0+
+* JSON2.js - (for IE < 8)
 
 Build
 -----

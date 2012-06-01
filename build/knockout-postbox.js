@@ -10,7 +10,11 @@
     //wrap notifySubscribers passing topic first and caching latest value
     ko.postbox.publish = function(topic, value) {
         if (topic) {
-            ko.postbox.topicCache[topic] = value;
+            //keep the value and a serialized version for comparison
+            ko.postbox.topicCache[topic] = {
+                value: value,
+                serialized: ko.toJSON(value)
+            };
             ko.postbox.notifySubscribers(value, topic);
         }
     };
@@ -23,9 +27,9 @@
         }
     };
 
-    //by default publish when the old value does not === new value
-    ko.postbox.defaultComparer = function(newValue, oldValue) {
-        return oldValue !== newValue;
+    //by default publish when the previous cached value does not equal the new value
+    ko.postbox.defaultComparer = function(newValue, cacheItem) {
+        return newValue === cacheItem.value && ko.toJSON(newValue) === cacheItem.serialized;
     };
 
     //augment observables/computeds with the ability to automatically publish updates on a topic
@@ -46,7 +50,7 @@
 
             //keep a reference to the subscription, so we can stop publishing
             this.postboxSubs[topic].publishOn = this.subscribe(function(newValue) {
-                if (equalityComparer.call(this, newValue, ko.postbox.topicCache[topic])) {
+                if (!equalityComparer.call(this, newValue, ko.postbox.topicCache[topic])) {
                     ko.postbox.publish(topic, newValue);
                 }
             }, this);
@@ -105,7 +109,7 @@
                 current = ko.postbox.topicCache[topic];
 
                 if (current !== undefined) {
-                    callback(current);
+                    callback(current.value);
                 }
             }
         }

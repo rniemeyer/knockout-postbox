@@ -1,6 +1,3 @@
-//TODO: test equalityComparer
-//TODO: test removeTopic
-
 describe("knockout-postbox", function(){
     var subscription, target, observable, computed, underlying, observableArray, value, newValue, arrayValue, newArrayValue, topic, callback, transform, arrayFilter;
 
@@ -325,10 +322,11 @@ describe("knockout-postbox", function(){
     });
 
     describe("publishOn", function() {
-        var lengthComparer = function(newValue, oldValue) {
+        var lengthComparer = function(newValue, cacheItem) {
+            var cached = cacheItem.value;
             newValue = newValue || "";
-            oldValue = oldValue || "";
-            return newValue.length > oldValue.length;
+            cached = cached.value || "";
+            return newValue.length < cached.length;
         };
 
         describe("when applied to an observable", function() {
@@ -371,13 +369,13 @@ describe("knockout-postbox", function(){
                         expect(callback).toHaveBeenCalledWith(value);
                     });
 
-                    it("should not publish when the equalityComparer returns false", function() {
+                    it("should not publish when the equalityComparer returns true", function() {
                         observableWithComparer(newValue);
                         observableWithComparer("a");
                         expect(callback).toHaveBeenCalledWith(newValue);
                     });
 
-                    it("should publish when the equalityComparer returns true", function() {
+                    it("should publish when the equalityComparer returns false", function() {
                         observableWithComparer(newValue);
                         expect(callback).toHaveBeenCalledWith(newValue);
                     });
@@ -393,13 +391,13 @@ describe("knockout-postbox", function(){
                             expect(callback).toHaveBeenCalledWith(value);
                         });
 
-                        it("should not publish when the equalityComparer returns false", function() {
+                        it("should not publish when the equalityComparer returns true", function() {
                             observableWithComparer(newValue);
                             observableWithComparer("a");
                             expect(callback).toHaveBeenCalledWith(newValue);
                         });
 
-                        it("should publish when the equalityComparer returns true", function() {
+                        it("should publish when the equalityComparer returns false", function() {
                             observableWithComparer(newValue);
                             expect(callback).toHaveBeenCalledWith(newValue);
                         });
@@ -415,13 +413,13 @@ describe("knockout-postbox", function(){
                             expect(callback).not.toHaveBeenCalled();
                         });
 
-                        it("should not publish when the equalityComparer returns false", function() {
+                        it("should not publish when the equalityComparer returns true", function() {
                             observableWithComparer(newValue);
                             observableWithComparer("a");
                             expect(callback).toHaveBeenCalledWith(newValue);
                         });
 
-                        it("should publish when the equalityComparer returns true", function() {
+                        it("should publish when the equalityComparer returns false", function() {
                             observableWithComparer(newValue);
                             expect(callback).toHaveBeenCalledWith(newValue);
                         });
@@ -484,13 +482,13 @@ describe("knockout-postbox", function(){
                         expect(callback).toHaveBeenCalledWith(value);
                     });
 
-                    it("should not publish when the equalityComparer returns false", function() {
+                    it("should not publish when the equalityComparer returns true", function() {
                         computedWithComparer(newValue);
                         computedWithComparer("a");
                         expect(callback).toHaveBeenCalledWith(newValue);
                     });
 
-                    it("should publish when the equalityComparer returns true", function() {
+                    it("should publish when the equalityComparer returns false", function() {
                         computedWithComparer(newValue);
                         expect(callback).toHaveBeenCalledWith(newValue);
                     });
@@ -510,13 +508,13 @@ describe("knockout-postbox", function(){
                             expect(callback).toHaveBeenCalledWith(value);
                         });
 
-                        it("should not publish when the equalityComparer returns false", function() {
+                        it("should not publish when the equalityComparer returns true", function() {
                             computedWithComparer(newValue);
                             computedWithComparer("a");
                             expect(callback).toHaveBeenCalledWith(newValue);
                         });
 
-                        it("should publish when the equalityComparer returns true", function() {
+                        it("should publish when the equalityComparer returns false", function() {
                             computedWithComparer(newValue);
                             expect(callback).toHaveBeenCalledWith(newValue);
                         });
@@ -536,13 +534,13 @@ describe("knockout-postbox", function(){
                             expect(callback).not.toHaveBeenCalled();
                         });
 
-                        it("should not publish when the equalityComparer returns false", function() {
+                        it("should not publish when the equalityComparer returns true", function() {
                             computedWithComparer(newValue);
                             computedWithComparer("a");
                             expect(callback).toHaveBeenCalledWith(newValue);
                         });
 
-                        it("should publish when the equalityComparer returns true", function() {
+                        it("should publish when the equalityComparer returns false", function() {
                             computedWithComparer(newValue);
                             expect(callback).toHaveBeenCalledWith(newValue);
                         });
@@ -568,6 +566,18 @@ describe("knockout-postbox", function(){
                 expect(callback).toHaveBeenCalledWith(newArrayValue);
             });
 
+            it("should publish when given a reference to the same array after it has been modified", function() {
+                callback.reset();
+                observableArray.push("extra_value");
+                expect(callback).toHaveBeenCalledWith(arrayValue);
+            });
+
+            it("should not publish when given a reference to the same array after it has been modified", function() {
+                callback.reset();
+                observableArray(arrayValue);
+                expect(callback).toHaveBeenCalledWith(arrayValue);
+            });
+
             it("should publish initially", function() {
                 expect(callback).toHaveBeenCalledWith(arrayValue);
             });
@@ -590,13 +600,13 @@ describe("knockout-postbox", function(){
                         expect(callback).toHaveBeenCalledWith(arrayValue);
                     });
 
-                    it("should not publish when the equalityComparer returns false", function() {
+                    it("should not publish when the equalityComparer returns true", function() {
                         observableArrayWithComparer(newArrayValue);
                         observableArrayWithComparer(arrayValue);
                         expect(callback).toHaveBeenCalledWith(newArrayValue);
                     });
 
-                    it("should publish when the equalityComparer returns true", function() {
+                    it("should publish when the equalityComparer returns false", function() {
                         observableArrayWithComparer(newArrayValue);
                         expect(callback).toHaveBeenCalledWith(newArrayValue);
                     });
@@ -612,13 +622,13 @@ describe("knockout-postbox", function(){
                             expect(callback).toHaveBeenCalledWith(arrayValue);
                         });
 
-                        it("should not publish when the equalityComparer returns false", function() {
+                        it("should not publish when the equalityComparer returns true", function() {
                             observableArrayWithComparer(newArrayValue);
                             observableArrayWithComparer(arrayValue);
                             expect(callback).toHaveBeenCalledWith(newArrayValue);
                         });
 
-                        it("should publish when the equalityComparer returns true", function() {
+                        it("should publish when the equalityComparer returns false", function() {
                             observableArrayWithComparer(newArrayValue);
                             expect(callback).toHaveBeenCalledWith(newArrayValue);
                         });
@@ -634,13 +644,13 @@ describe("knockout-postbox", function(){
                             expect(callback).not.toHaveBeenCalled();
                         });
 
-                        it("should not publish when the equalityComparer returns false", function() {
+                        it("should not publish when the equalityComparer returns true", function() {
                             observableArrayWithComparer(newArrayValue);
                             observableArrayWithComparer(arrayValue);
                             expect(callback).toHaveBeenCalledWith(newArrayValue);
                         });
 
-                        it("should publish when the equalityComparer returns true", function() {
+                        it("should publish when the equalityComparer returns false", function() {
                             observableArrayWithComparer(newArrayValue);
                             expect(callback).toHaveBeenCalledWith(newArrayValue);
                         });
@@ -748,15 +758,15 @@ describe("knockout-postbox", function(){
             });
 
             it("should publish on topic when updated", function() {
-                newValue = [newValue];
-                observableArray(newValue);
-                expect(secondObservableArray()).toEqual(newValue);
+                secondObservableArray([]);
+                observableArray.push("extra_value");
+                expect(secondObservableArray()).toEqual(arrayValue);
             });
 
             it("should update when the topic is published on", function() {
-                newValue = [newValue];
-                secondObservableArray(newValue);
-                expect(observableArray()).toEqual(newValue);
+                observableArray([]);
+                secondObservableArray.push("extra_value");
+                expect(observableArray()).toEqual(arrayValue);
             });
 
             describe("when initializing the value", function() {
