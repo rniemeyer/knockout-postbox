@@ -1,34 +1,46 @@
-//knockout-postbox v0.1.0 | (c) 2012 Ryan Niemeyer | http://www.opensource.org/licenses/mit-license
-(function(ko, undefined) {
-    var disposeTopicSubscription, existingSubscribe;
+//knockout-postbox v0.2.1 | (c) 2012 Ryan Niemeyer | http://www.opensource.org/licenses/mit-license
+!(function(definition) {
+    //CommonJS
+    if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
+        definition(require("knockout"));
+    //AMD
+    } else if (typeof define === "function" && define.amd) {
+        define(["knockout"], definition);
+    //normal script tag
+    } else {
+        definition(ko);
+    }
+}(function(ko, undefined) {
+    var disposeTopicSubscription, existingSubscribe, postbox;
 
     //create a global postbox that supports subscribing/publishing
-    ko.postbox = new ko.subscribable();
+    postbox = ko.postbox = new ko.subscribable();
+
     //keep a cache of the latest value and subscribers
-    ko.postbox.topicCache = {};
+    postbox.topicCache = {};
 
     //wrap notifySubscribers passing topic first and caching latest value
-    ko.postbox.publish = function(topic, value) {
+    postbox.publish = function(topic, value) {
         if (topic) {
             //keep the value and a serialized version for comparison
-            ko.postbox.topicCache[topic] = {
+            postbox.topicCache[topic] = {
                 value: value,
                 serialized: ko.toJSON(value)
             };
-            ko.postbox.notifySubscribers(value, topic);
+            postbox.notifySubscribers(value, topic);
         }
     };
 
     //provide a subscribe API for the postbox that takes in the topic as first arg
-    existingSubscribe = ko.postbox.subscribe;
-    ko.postbox.subscribe = function(topic, action, target) {
+    existingSubscribe = postbox.subscribe;
+    postbox.subscribe = function(topic, action, target) {
         if (topic) {
-            return existingSubscribe.call(ko.postbox, action, target, topic);
+            return existingSubscribe.call(postbox, action, target, topic);
         }
     };
 
     //by default publish when the previous cached value does not equal the new value
-    ko.postbox.defaultComparer = function(newValue, cacheItem) {
+    postbox.defaultComparer = function(newValue, cacheItem) {
         return newValue === cacheItem.value && ko.toJSON(newValue) === cacheItem.serialized;
     };
 
@@ -43,21 +55,21 @@
                 skipInitialPublish = skipInitialOrEqualityComparer;
             }
 
-            equalityComparer = equalityComparer || ko.postbox.defaultComparer;
+            equalityComparer = equalityComparer || postbox.defaultComparer;
 
             //remove any existing subs
             disposeTopicSubscription.call(this, topic, "publishOn");
 
             //keep a reference to the subscription, so we can stop publishing
             this.postboxSubs[topic].publishOn = this.subscribe(function(newValue) {
-                if (!equalityComparer.call(this, newValue, ko.postbox.topicCache[topic])) {
-                    ko.postbox.publish(topic, newValue);
+                if (!equalityComparer.call(this, newValue, postbox.topicCache[topic])) {
+                    postbox.publish(topic, newValue);
                 }
             }, this);
 
             //do an initial publish
             if (!skipInitialPublish) {
-                ko.postbox.publish(topic, this());
+                postbox.publish(topic, this());
             }
         }
 
@@ -103,10 +115,10 @@
             };
 
             //keep a reference to the subscription, so we can unsubscribe, if necessary
-            this.postboxSubs[topic].subscribeTo = ko.postbox.subscribe(topic, callback);
+            this.postboxSubs[topic].subscribeTo = postbox.subscribe(topic, callback);
 
             if (initializeWithLatestValue) {
-                current = ko.postbox.topicCache[topic];
+                current = postbox.topicCache[topic];
 
                 if (current !== undefined) {
                     callback(current.value);
@@ -132,4 +144,4 @@
 
         return this;
     };
-}(ko));
+}));
