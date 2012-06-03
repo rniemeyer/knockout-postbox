@@ -1,8 +1,9 @@
-define(["knockout", "knockout-postbox"], function(ko) {
+define(["knockout", "knockout-postbox"], function(ko, postbox) {
     return function() {
         this.visible = ko.observable(false);
+
         //as an alternative, use a direct subscription on the topic to update the observable
-        ko.postbox.subscribe("section", function(newValue) {
+        postbox.subscribe("section", function(newValue) {
             this.visible(newValue === "Notifications");
         }, this);
 

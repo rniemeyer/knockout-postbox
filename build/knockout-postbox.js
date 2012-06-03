@@ -1,46 +1,46 @@
-//knockout-postbox v0.2.1 | (c) 2012 Ryan Niemeyer | http://www.opensource.org/licenses/mit-license
-!(function(definition) {
+//knockout-postbox v0.2.2 | (c) 2012 Ryan Niemeyer | http://www.opensource.org/licenses/mit-license
+!(function(factory) {
     //CommonJS
     if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
-        definition(require("knockout"));
+        factory(require("knockout"), exports);
     //AMD
     } else if (typeof define === "function" && define.amd) {
-        define(["knockout"], definition);
+        define(["knockout", "exports"], factory);
     //normal script tag
     } else {
-        definition(ko);
+        factory(ko, ko.postbox = {});
     }
-}(function(ko, undefined) {
-    var disposeTopicSubscription, existingSubscribe, postbox;
+}(function(ko, exports, undefined) {
+    var disposeTopicSubscription, existingSubscribe;
 
     //create a global postbox that supports subscribing/publishing
-    postbox = ko.postbox = new ko.subscribable();
+    ko.subscribable.call(exports);
 
     //keep a cache of the latest value and subscribers
-    postbox.topicCache = {};
+    exports.topicCache = {};
 
     //wrap notifySubscribers passing topic first and caching latest value
-    postbox.publish = function(topic, value) {
+    exports.publish = function(topic, value) {
         if (topic) {
             //keep the value and a serialized version for comparison
-            postbox.topicCache[topic] = {
+            exports.topicCache[topic] = {
                 value: value,
                 serialized: ko.toJSON(value)
             };
-            postbox.notifySubscribers(value, topic);
+            exports.notifySubscribers(value, topic);
         }
     };
 
     //provide a subscribe API for the postbox that takes in the topic as first arg
-    existingSubscribe = postbox.subscribe;
-    postbox.subscribe = function(topic, action, target) {
+    existingSubscribe = exports.subscribe;
+    exports.subscribe = function(topic, action, target) {
         if (topic) {
-            return existingSubscribe.call(postbox, action, target, topic);
+            return existingSubscribe.call(exports, action, target, topic);
         }
     };
 
     //by default publish when the previous cached value does not equal the new value
-    postbox.defaultComparer = function(newValue, cacheItem) {
+    exports.defaultComparer = function(newValue, cacheItem) {
         return newValue === cacheItem.value && ko.toJSON(newValue) === cacheItem.serialized;
     };
 
@@ -55,21 +55,21 @@
                 skipInitialPublish = skipInitialOrEqualityComparer;
             }
 
-            equalityComparer = equalityComparer || postbox.defaultComparer;
+            equalityComparer = equalityComparer || exports.defaultComparer;
 
             //remove any existing subs
             disposeTopicSubscription.call(this, topic, "publishOn");
 
             //keep a reference to the subscription, so we can stop publishing
             this.postboxSubs[topic].publishOn = this.subscribe(function(newValue) {
-                if (!equalityComparer.call(this, newValue, postbox.topicCache[topic])) {
-                    postbox.publish(topic, newValue);
+                if (!equalityComparer.call(this, newValue, exports.topicCache[topic])) {
+                    exports.publish(topic, newValue);
                 }
             }, this);
 
             //do an initial publish
             if (!skipInitialPublish) {
-                postbox.publish(topic, this());
+                exports.publish(topic, this());
             }
         }
 
@@ -115,10 +115,10 @@
             };
 
             //keep a reference to the subscription, so we can unsubscribe, if necessary
-            this.postboxSubs[topic].subscribeTo = postbox.subscribe(topic, callback);
+            this.postboxSubs[topic].subscribeTo = exports.subscribe(topic, callback);
 
             if (initializeWithLatestValue) {
-                current = postbox.topicCache[topic];
+                current = exports.topicCache[topic];
 
                 if (current !== undefined) {
                     callback(current.value);

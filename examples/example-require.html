@@ -9,6 +9,7 @@
     <div class="container">
         <div id="menu">
             <h2><span data-bind="text: name"></span>'s Settings</h2>
+            <input type="checkbox" data-bind="checked: loggingEnabled" /> Enable Logging
             <ul class="nav nav-pills" data-bind="foreach: sections">
                 <li data-bind="css: { active: $root.selectedSection() === $data }">
                     <a href="#" data-bind="text: $data, click: $root.selectedSection"></a>

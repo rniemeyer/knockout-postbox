@@ -5,7 +5,7 @@ require.config({
     }
 });
 
-require(["knockout", "menu", "profile", "notifications"], function(ko, MenuModel, ProfileModel, NotificationsModel) {
+require(["knockout", "menu", "profile", "notifications", "logger"], function(ko, MenuModel, ProfileModel, NotificationsModel, logger) {
     ko.applyBindings(new MenuModel(), document.getElementById("menu"));
     ko.applyBindings(new ProfileModel(), document.getElementById("profile"));
     ko.applyBindings(new NotificationsModel(), document.getElementById("notifications"));
