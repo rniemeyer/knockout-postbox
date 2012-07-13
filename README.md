@@ -111,6 +111,10 @@ Build
 -----
 This project uses anvil.js (see http://github.com/arobson/anvil.js) for building/minifying.
 
+Install from NuGet
+------------------
+    Install-Package Knockout-Postbox
+
 Examples
 --------
 The `examples` directory contains a sample that shows how three independent view models can exchange information without direct references to each other.
