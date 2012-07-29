@@ -96,6 +96,19 @@ The `syncWith` function tells an observable to both subscribe and publish on a t
 ```js
 //subscribe to and publish on a topic
 this.topic = ko.observable(value).syncWith("mytopic");
+
+//subscribe to and publish on a topic and use the last published value to initialize the observable
+this.topic = ko.observable().syncWith("mytopic", true);
+
+//subscribe to and publish on a topic, but do not publish out the observable's value initially
+this.topic = ko.observable(value).syncWith("mytopic", false, true);
+
+//subscribe to and publish on a topic, but only publish when the comparer function returns false
+var comparer = function(newValue, oldValue) {
+    return newValue < oldValue;
+};
+
+this.topic = ko.observable(value).syncWith("mytopic", false, false, comparer);
 ```
 
 **ko.postbox.defaultComparer**
