@@ -41,7 +41,7 @@
 
     //by default publish when the previous cached value does not equal the new value
     exports.defaultComparer = function(newValue, cacheItem) {
-        return newValue === cacheItem.value && ko.toJSON(newValue) === cacheItem.serialized;
+        return cacheItem && newValue === cacheItem.value && ko.toJSON(newValue) === cacheItem.serialized;
     };
 
     //augment observables/computeds with the ability to automatically publish updates on a topic

@@ -6,7 +6,7 @@ describe("knockout-postbox", function(){
     });
 
     beforeEach(function() {
-        delete ko.postbox.topicCache[topic];
+        ko.postbox.topicCache = {};
         value = "test_value";
         newValue = "newer_value";
         topic = "test_topic";
@@ -355,6 +355,15 @@ describe("knockout-postbox", function(){
                     callback.reset();
                     observable = ko.observable(value).publishOn(topic, true);
                     expect(callback).not.toHaveBeenCalled();
+                });
+
+                it("should publish on next change", function() {
+                    callback.reset();
+                    ko.postbox.topicCache = {};
+                    observable = ko.observable(value).publishOn(topic, true);
+                    expect(callback).not.toHaveBeenCalled();
+                    observable(newValue);
+                    expect(callback).toHaveBeenCalled();
                 });
             });
 

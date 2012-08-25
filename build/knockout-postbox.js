@@ -1,4 +1,4 @@
-//knockout-postbox v0.2.2 | (c) 2012 Ryan Niemeyer | http://www.opensource.org/licenses/mit-license
+//knockout-postbox v0.2.3 | (c) 2012 Ryan Niemeyer | http://www.opensource.org/licenses/mit-license//knockout-postbox v0.2.2 | (c) 2012 Ryan Niemeyer | http://www.opensource.org/licenses/mit-license
 !(function(factory) {
     //CommonJS
     if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
@@ -41,7 +41,7 @@
 
     //by default publish when the previous cached value does not equal the new value
     exports.defaultComparer = function(newValue, cacheItem) {
-        return newValue === cacheItem.value && ko.toJSON(newValue) === cacheItem.serialized;
+        return cacheItem && newValue === cacheItem.value && ko.toJSON(newValue) === cacheItem.serialized;
     };
 
     //augment observables/computeds with the ability to automatically publish updates on a topic
