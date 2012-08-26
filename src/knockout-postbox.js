@@ -1,4 +1,3 @@
-//knockout-postbox v0.2.2 | (c) 2012 Ryan Niemeyer | http://www.opensource.org/licenses/mit-license
 !(function(factory) {
     //CommonJS
     if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
