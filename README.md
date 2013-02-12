@@ -4,6 +4,39 @@ knockout-postbox
 
 More background here: http://www.knockmeout.net/2012/05/using-ko-native-pubsub.html
 
+This allows you to set up simple topic-based communication like:
+
+```js
+var ViewModelOne = function() {
+  //automatically update the observable's value from ko.postbox messages on "myEditableTopic"
+  this.isEditable = ko.observable().subscribeTo("myEditableTopic");  
+};
+
+var ViewModelTwo = function() {
+  //automatically publish changes through ko.postbox using the "myEditableTopic" as the topic
+  this.editable = ko.observable(false).publishOn("myEditableTopic");  
+};
+
+var ViewModelThree = function() {
+  //both subscribe to and publish changes on the topic "myEditableTopic"
+  this.canEdit = ko.observable().syncWith("myEditableTopic");
+};
+
+//a non-KO component can also participate in this communication
+var SomeOtherComponent = function() {
+  //subscribe directly to the topic
+  ko.postbox.subscribe("myEditableTopic", function(newValue) {
+     //do something with newValue
+  }); 
+  
+  //publish on the topic
+  ko.postbox.publish("myEditableTopic", "some new value");
+};
+```
+
+The observable extensions accept additional arguments that can help to custom the sending/receiving behavior, as described below.
+
+
 Basic Usage
 -----------
 
@@ -13,7 +46,7 @@ Basic Usage
 
 ```js
 ko.postbox.subscribe("mytopic", function(newValue) {
-    this.topic("Topic: " + newValue);
+    console.log("Value: " + newValue);
 }, viewModel);
 ```
 
@@ -35,20 +68,20 @@ The `subscribeTo` function tells an observable to automatically update itself wh
 
 ```js
 //update the value from messages on "mytopic"
-this.topic = ko.observable().subscribeTo("mytopic");
+this.value = ko.observable().subscribeTo("mytopic");
 
 //receive updates from "mytopic" and use the last published value to initialize the observable
-this.topic = ko.observable().subscribeTo("mytopic", true);
+this.value = ko.observable().subscribeTo("mytopic", true);
 
 //receive updates from "mytopic" and update the value after passing it through the transform function
 var transform = function(newValue) {
     return newValue && newValue.toLowerCase();
 };
 
-this.topic = ko.observable().subscribeTo("mytopic", transform);
+this.value = ko.observable().subscribeTo("mytopic", transform);
 
 //receive updates from "mytopic", initialize with latest published value, and send updates through transform
-this.topic = ko.observable().subscribeTo("mytopic", true, transform);
+this.value = ko.observable().subscribeTo("mytopic", true, transform);
 ```
 
 
@@ -57,7 +90,7 @@ this.topic = ko.observable().subscribeTo("mytopic", true, transform);
 The `unsubscribeFrom` function removes the subscription that an observable has on a topic.
 
 ```js
-this.topic = ko.observable().unsubscribeFrom("mytopic");
+this.value.unsubscribeFrom("mytopic");
 ```
 
 
@@ -67,20 +100,20 @@ The `publishOn` function tells an observable to automatically publish its value 
 
 ```js
 //whenever the value changes publish a message on "mytopic"
-this.topic = ko.observable(value).publishOn("mytopic");
+this.value = ko.observable(value).publishOn("mytopic");
 
 //publish changes on "mytopic", but skip publishing the current value immediately
-this.topic = ko.observable(value).publishOn("mytopic", true);
+this.value = ko.observable(value).publishOn("mytopic", true);
 
 //publish changes on "mytopic" when the comparer function returns false
 var comparer = function(newValue, oldValue) {
     return newValue < oldValue;
 };
 
-this.topic = ko.observable(value).publishOn("mytopic", comparer);
+this.value = ko.observable(value).publishOn("mytopic", comparer);
 
 //publish changes on "mytopic", skip initial publish, and use override comparer
-this.topic = ko.observable(value).publishOn("mytopic", true, comparer);
+this.value = ko.observable(value).publishOn("mytopic", true, comparer);
 ```
 
 
@@ -88,6 +121,9 @@ this.topic = ko.observable(value).publishOn("mytopic", true, comparer);
 
 The `stopPublishingOn` function removes the subscription used to automatically publish changes to the observable.
 
+```js
+this.value.stopPublishingOn("mytopic");
+```
 
 **syncWith** *- syncWith(topic, [initializeWithLatestValue], [skipInitialPublish], [equalityComparer])*
 
@@ -95,20 +131,20 @@ The `syncWith` function tells an observable to both subscribe and publish on a t
 
 ```js
 //subscribe to and publish on a topic
-this.topic = ko.observable(value).syncWith("mytopic");
+this.value = ko.observable(value).syncWith("mytopic");
 
 //subscribe to and publish on a topic and use the last published value to initialize the observable
-this.topic = ko.observable().syncWith("mytopic", true);
+this.value = ko.observable().syncWith("mytopic", true);
 
 //subscribe to and publish on a topic, but do not publish out the observable's value initially
-this.topic = ko.observable(value).syncWith("mytopic", false, true);
+this.value = ko.observable(value).syncWith("mytopic", false, true);
 
 //subscribe to and publish on a topic, but only publish when the comparer function returns false
 var comparer = function(newValue, oldValue) {
     return newValue < oldValue;
 };
 
-this.topic = ko.observable(value).syncWith("mytopic", false, false, comparer);
+this.value = ko.observable(value).syncWith("mytopic", false, false, comparer);
 ```
 
 **ko.postbox.defaultComparer**
