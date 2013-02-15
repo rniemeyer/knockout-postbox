@@ -13,7 +13,7 @@ var ViewModelOne = function() {
 };
 
 var ViewModelTwo = function() {
-  //automatically publish changes through ko.postbox using the "myEditableTopic" as the topic
+  //automatically publish changes through ko.postbox using "myEditableTopic" as the topic
   this.editable = ko.observable(false).publishOn("myEditableTopic");  
 };
 
@@ -40,7 +40,7 @@ The observable extensions accept additional arguments that can help to custom th
 var one = new ViewModelOne();
 var two = new ViewModelTwo();
 
-var editabelTopic = "myEditableTopic";
+var editableTopic = "myEditableTopic";
 one.isEditable.subscribeTo(editableTopic);
 two.editable.publishOn(editableTopic)
 ```
