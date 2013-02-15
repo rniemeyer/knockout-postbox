@@ -34,7 +34,16 @@ var SomeOtherComponent = function() {
 };
 ```
 
-The observable extensions accept additional arguments that can help to custom the sending/receiving behavior, as described below.
+The observable extensions accept additional arguments that can help to custom the sending/receiving behavior, as described below. Additionally, the subscriptions do not need to be created when the observables are created. You could just as easily wire these up later, if you don't want the individual view models to know that they are participating in this communication.
+
+```js
+var one = new ViewModelOne();
+var two = new ViewModelTwo();
+
+var editabelTopic = "myEditableTopic";
+one.isEditable.subscribeTo(editableTopic);
+two.editable.publishOn(editableTopic)
+```
 
 
 Basic Usage
