@@ -37,6 +37,14 @@ var SomeOtherComponent = function() {
 The observable extensions accept additional arguments that can help to custom the sending/receiving behavior, as described below. Additionally, the subscriptions do not need to be created when the observables are created. You could just as easily wire these up later, if you don't want the individual view models to know that they are participating in this communication.
 
 ```js
+var ViewModelOne = function() {
+  this.isEditable = ko.observable();  
+};
+
+var ViewModelTwo = function() {
+  this.editable = ko.observable(false);  
+};
+
 var one = new ViewModelOne();
 var two = new ViewModelTwo();
 
