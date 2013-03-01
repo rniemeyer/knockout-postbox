@@ -18,13 +18,16 @@
     //keep a cache of the latest value and subscribers
     exports.topicCache = {};
 
+    //allow customization of the function used to serialize values for the topic cache
+    exports.serializer = ko.toJSON;
+
     //wrap notifySubscribers passing topic first and caching latest value
     exports.publish = function(topic, value) {
         if (topic) {
             //keep the value and a serialized version for comparison
             exports.topicCache[topic] = {
                 value: value,
-                serialized: ko.toJSON(value)
+                serialized: exports.serializer(value)
             };
             exports.notifySubscribers(value, topic);
         }
@@ -40,7 +43,7 @@
 
     //by default publish when the previous cached value does not equal the new value
     exports.defaultComparer = function(newValue, cacheItem) {
-        return cacheItem && newValue === cacheItem.value && ko.toJSON(newValue) === cacheItem.serialized;
+        return cacheItem && exports.serializer(newValue) === cacheItem.serialized;
     };
 
     //augment observables/computeds with the ability to automatically publish updates on a topic

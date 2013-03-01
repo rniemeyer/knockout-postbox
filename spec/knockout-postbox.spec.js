@@ -14,7 +14,7 @@ describe("knockout-postbox", function(){
         newArrayValue = [value, newValue];
     });
 
-    describe("ko.postbox.subscribe/publishOn", function() {
+    describe("ko.postbox.subscribe/publish", function() {
         beforeEach(function() {
             target = {};
             callback = jasmine.createSpy("callback").andCallFake(function() { return this; });
@@ -34,6 +34,53 @@ describe("knockout-postbox", function(){
         it("should execute the callback with this being the target", function() {
             ko.postbox.publish(topic, value);
             expect(callback.mostRecentCall.object).toEqual(target);
+        });
+    });
+
+    describe("ko.postbox.serializer", function() {
+        it("should use ko.toJSON as the default serializer", function() {
+            var message = { test: ko.observable(value) };
+            ko.postbox.publish(topic, message);
+            expect(ko.postbox.topicCache[topic].serialized).toEqual(ko.toJSON(message));
+        });
+
+        describe("using a custom serializer", function() {
+            //add a custom serialier
+            var originalSerializer, message;
+            beforeEach(function() {
+                originalSerializer = ko.postbox.serializer;
+                //this test serializer just returns a string
+                ko.postbox.serializer = function(val) {
+                    return value;
+                };
+
+                message = { test: value };
+            });
+
+            //restore the original serializer
+            afterEach(function() {
+                ko.postbox.serializer = originalSerializer;
+            });
+
+            it("should keep a serialized value cached for comparison", function() {
+                ko.postbox.publish(topic, message);
+                expect(ko.postbox.topicCache[topic].serialized).toEqual(value);
+
+                //restore
+                ko.postbox.serializer = originalSerializer;
+            });
+
+            it("observables should not publish when the cached value matches the new serialized value", function() {
+                var callback = jasmine.createSpy("callback").andCallFake(function() { return this; }),
+                    publisher = ko.observable().publishOn(topic);
+
+                publisher(message);
+                ko.postbox.subscribe(topic, callback);
+                //publish again with a different message, which will still get serialized to the same value by our custom serializer
+                publisher(newValue);
+
+                expect(callback).not.toHaveBeenCalled();
+            });
         });
     });
 
