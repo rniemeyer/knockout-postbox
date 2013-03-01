@@ -1,0 +1,1 @@
+//knockout-postbox 0.3.0 | (c) 2013 Ryan Niemeyer | http://www.opensource.org/licenses/mit-license
