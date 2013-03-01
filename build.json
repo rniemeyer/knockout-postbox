@@ -7,7 +7,7 @@
 	"uglify": {},
 	"gzip": false,
 	"finalize": {
-		"header": "//knockout-postbox v0.2.4 | (c) 2012 Ryan Niemeyer | http://www.opensource.org/licenses/mit-license\n"
+		"header": "//knockout-postbox v0.3.0 | (c) 2012 Ryan Niemeyer | http://www.opensource.org/licenses/mit-license\n"
 	},
 	"hosts": {
 		"/examples": "./examples",

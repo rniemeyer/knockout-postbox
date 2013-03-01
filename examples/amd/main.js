@@ -1,6 +1,6 @@
 require.config({
     paths: {
-        "knockout": "../../ext/knockout-2.1.0",
+        "knockout": "../../ext/knockout-2.2.1",
         "knockout-postbox": "../../build/knockout-postbox.min"
     }
 });
