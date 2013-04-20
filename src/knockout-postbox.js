@@ -146,4 +146,6 @@
 
         return this;
     };
+
+    ko.postbox = exports;
 }));
