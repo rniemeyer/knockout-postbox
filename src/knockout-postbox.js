@@ -1,4 +1,4 @@
-!(function(factory) {
+;(function(factory) {
     //CommonJS
     if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
         factory(require("knockout"), exports);

@@ -176,7 +176,7 @@ Dependencies
 
 Build
 -----
-This project uses anvil.js (see http://github.com/arobson/anvil.js) for building/minifying.
+This project uses [grunt](http://gruntjs.com/) for building/minifying.
 
 Install from NuGet
 ------------------
