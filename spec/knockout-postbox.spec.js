@@ -35,6 +35,14 @@ describe("knockout-postbox", function(){
             ko.postbox.publish(topic, value);
             expect(callback.mostRecentCall.object).toEqual(target);
         });
+
+        it("should not error when subscribing with missing topic", function() {
+            ko.postbox.subscribe(null, callback);
+        });
+
+        it("should not error when publishing with missing topic", function() {
+            ko.postbox.publish(null, newValue);
+        });
     });
 
     describe("ko.postbox.serializer", function() {
@@ -119,6 +127,10 @@ describe("knockout-postbox", function(){
             it("should not update when another topic is published on", function() {
                ko.postbox.publish("bad_topic", newValue);
                 expect(observable()).toEqual(value);
+            });
+
+            it("should not error when topic is missing", function() {
+               ko.observable().subscribeTo(null);
             });
 
             describe("when initializing the value", function() {
@@ -395,6 +407,10 @@ describe("knockout-postbox", function(){
 
             it("should publish initially", function() {
                 expect(callback).toHaveBeenCalledWith(value);
+            });
+
+            it("should not error when topic is missing", function() {
+                ko.observable().publishOn(null);
             });
 
             describe("when not publishing initial value", function() {
