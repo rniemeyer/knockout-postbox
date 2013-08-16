@@ -43,6 +43,44 @@ describe("knockout-postbox", function(){
         it("should not error when publishing with missing topic", function() {
             ko.postbox.publish(null, newValue);
         });
+
+        describe("when initializing the value", function() {
+            beforeEach(function() {
+                target = {};
+                callback = jasmine.createSpy("callback").andCallFake(function() { return this; });
+            });
+
+            it("should receive the last published value", function() {
+                ko.postbox.publish(topic, newValue);
+                var newSubscription = ko.postbox.subscribe(topic, callback, target, true);
+                expect(callback).toHaveBeenCalledWith(newValue);
+            });
+
+            it("should not execute callback before publish", function() {
+                var newSubscription = ko.postbox.subscribe(topic, callback, target, true);
+                expect(callback).not.toHaveBeenCalled();
+                ko.postbox.publish(topic, newValue);
+                expect(callback).toHaveBeenCalledWith(newValue);
+            });
+
+            describe("when passing as the third argument", function(){
+                beforeEach(function(){
+                });
+
+                it("should receive the last published value", function() {
+                    ko.postbox.publish(topic, newValue);
+                    var newSubscription = ko.postbox.subscribe(topic, callback, true);
+                    expect(callback).toHaveBeenCalledWith(newValue);
+                });
+
+                it("should not execute callback before publish", function() {
+                    var newSubscription = ko.postbox.subscribe(topic, callback, true);
+                    expect(callback).not.toHaveBeenCalled();
+                    ko.postbox.publish(topic, newValue);
+                    expect(callback).toHaveBeenCalledWith(newValue);
+                });
+            });
+        });
     });
 
     describe("ko.postbox.serializer", function() {
