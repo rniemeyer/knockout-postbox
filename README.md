@@ -60,12 +60,17 @@ Basic Usage
 
 *knockout-postbox* creates a `ko.postbox` object that can be used for basic pub/sub communication. However, typically you would use the observable extensions rather than calling the `ko.postbox` APIs directly, unless you are integrating with a non-KO component.
 
-**subscribe** *- ko.postbox.subscribe(topic, handler, target)*
+**subscribe** *- ko.postbox.subscribe(topic, handler, [target], [initializeWithLatestValue])*
 
 ```js
 ko.postbox.subscribe("mytopic", function(newValue) {
     console.log("Value: " + newValue);
 }, viewModel);
+
+//receive updates from "mytopic", initialize with latest published value
+ko.postbox.subscribe("mytopic", function(newValue) {
+    console.log("Value: " + newValue);
+}, viewModel, true);
 ```
 
 

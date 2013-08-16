@@ -38,6 +38,14 @@
     existingSubscribe = exports.subscribe;
     exports.subscribe = function(topic, action, target, initializeWithLatestValue) {
         if (topic) {
+            //create the subscription before possibly triggering a long-running callback
+            var subscription = existingSubscribe.call(exports, action, target, topic);
+
+            if (typeof target === "boolean") {
+                initializeWithLatestValue = target;
+                target = undefined;
+            }
+
             if (initializeWithLatestValue) {
                 current = exports.topicCache[topic];
 
@@ -45,7 +53,7 @@
                     action(current.value);
                 }
             }
-            return existingSubscribe.call(exports, action, target, topic);
+            return subscription;
         }
     };
 
