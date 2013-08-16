@@ -36,8 +36,15 @@
 
     //provide a subscribe API for the postbox that takes in the topic as first arg
     existingSubscribe = exports.subscribe;
-    exports.subscribe = function(topic, action, target) {
+    exports.subscribe = function(topic, action, target, initializeWithLatestValue) {
         if (topic) {
+            if (initializeWithLatestValue) {
+                current = exports.topicCache[topic];
+
+                if (current !== undefined) {
+                    action(current.value);
+                }
+            }
             return existingSubscribe.call(exports, action, target, topic);
         }
     };
