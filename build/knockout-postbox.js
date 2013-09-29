@@ -1,4 +1,4 @@
-// knockout-postbox 0.3.1 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
+// knockout-postbox 0.4.0 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
 ;(function(factory) {
     //CommonJS
     if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
@@ -37,14 +37,15 @@
     //provide a subscribe API for the postbox that takes in the topic as first arg
     existingSubscribe = exports.subscribe;
     exports.subscribe = function(topic, action, target, initializeWithLatestValue) {
-        if (topic) {
-            //create the subscription before possibly triggering a long-running callback
-            var subscription = existingSubscribe.call(exports, action, target, topic);
+        var subscription, current;
 
+        if (topic) {
             if (typeof target === "boolean") {
                 initializeWithLatestValue = target;
                 target = undefined;
             }
+
+            subscription = existingSubscribe.call(exports, action, target, topic);
 
             if (initializeWithLatestValue) {
                 current = exports.topicCache[topic];
@@ -53,6 +54,7 @@
                     action(current.value);
                 }
             }
+
             return subscription;
         }
     };
