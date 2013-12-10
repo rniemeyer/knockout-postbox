@@ -1,4 +1,4 @@
-// knockout-postbox 0.4.1 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
+// knockout-postbox 0.4.2 | (c) 2013 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
 ;(function(factory) {
     //CommonJS
     if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
@@ -51,7 +51,7 @@
                 current = exports.topicCache[topic];
 
                 if (current !== undefined) {
-                    action(current.value);
+                    action.call(target, current.value);
                 }
             }
 

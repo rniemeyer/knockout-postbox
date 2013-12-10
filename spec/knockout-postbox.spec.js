@@ -56,6 +56,13 @@ describe("knockout-postbox", function(){
                 expect(callback).toHaveBeenCalledWith(newValue);
             });
 
+            it("should call the callback with the appropriate target as the context during initialization", function() {
+                ko.postbox.publish(topic, newValue);
+                var newSubscription = ko.postbox.subscribe(topic, callback, target, true);
+
+                expect(callback.mostRecentCall.object).toEqual(target);
+            });
+
             it("should not execute callback before publish", function() {
                 var newSubscription = ko.postbox.subscribe(topic, callback, target, true);
                 expect(callback).not.toHaveBeenCalled();
@@ -63,10 +70,7 @@ describe("knockout-postbox", function(){
                 expect(callback).toHaveBeenCalledWith(newValue);
             });
 
-            describe("when passing as the third argument", function(){
-                beforeEach(function(){
-                });
-
+            describe("when passing as the third argument", function() {
                 it("should receive the last published value", function() {
                     ko.postbox.publish(topic, newValue);
                     var newSubscription = ko.postbox.subscribe(topic, callback, true);

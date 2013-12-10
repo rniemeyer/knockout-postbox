@@ -1,6 +1,6 @@
 {
   "name": "knockout-postbox",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-uglify": "0.x.x",

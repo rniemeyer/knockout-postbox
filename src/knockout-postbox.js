@@ -50,7 +50,7 @@
                 current = exports.topicCache[topic];
 
                 if (current !== undefined) {
-                    action(current.value);
+                    action.call(target, current.value);
                 }
             }
 
