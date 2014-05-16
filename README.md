@@ -187,6 +187,10 @@ Install from NuGet
 ------------------
     Install-Package Knockout-Postbox
 
+Install from Bower
+------------------
+    bower install knockout-postbox
+
 Examples
 --------
 The `examples` directory contains a sample that shows how three independent view models can exchange information without direct references to each other.
