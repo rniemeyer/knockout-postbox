@@ -17,7 +17,7 @@ describe("knockout-postbox", function(){
     describe("ko.postbox.subscribe/publish", function() {
         beforeEach(function() {
             target = {};
-            callback = jasmine.createSpy("callback").andCallFake(function() { return this; });
+            callback = jasmine.createSpy("callback").and.callFake(function() { return this; });
             subscription = ko.postbox.subscribe(topic, callback, target);
         });
 
@@ -33,21 +33,21 @@ describe("knockout-postbox", function(){
 
         it("should execute the callback with this being the target", function() {
             ko.postbox.publish(topic, value);
-            expect(callback.mostRecentCall.object).toEqual(target);
+            expect(callback.calls.mostRecent().object).toEqual(target);
         });
 
         it("should not error when subscribing with missing topic", function() {
-            ko.postbox.subscribe(null, callback);
+            expect(ko.postbox.subscribe.bind(ko.postbox, null, callback)).not.toThrow();
         });
 
         it("should not error when publishing with missing topic", function() {
-            ko.postbox.publish(null, newValue);
+            expect(ko.postbox.publish.bind(ko.postbox, null, newValue)).not.toThrow();
         });
 
         describe("when initializing the value", function() {
             beforeEach(function() {
                 target = {};
-                callback = jasmine.createSpy("callback").andCallFake(function() { return this; });
+                callback = jasmine.createSpy("callback").and.callFake(function() { return this; });
             });
 
             it("should receive the last published value", function() {
@@ -60,7 +60,7 @@ describe("knockout-postbox", function(){
                 ko.postbox.publish(topic, newValue);
                 var newSubscription = ko.postbox.subscribe(topic, callback, target, true);
 
-                expect(callback.mostRecentCall.object).toEqual(target);
+                expect(callback.calls.mostRecent().object).toEqual(target);
             });
 
             it("should not execute callback before publish", function() {
@@ -121,7 +121,7 @@ describe("knockout-postbox", function(){
             });
 
             it("observables should not publish when the cached value matches the new serialized value", function() {
-                var callback = jasmine.createSpy("callback").andCallFake(function() { return this; }),
+                var callback = jasmine.createSpy("callback").and.callFake(function() { return this; }),
                     publisher = ko.observable().publishOn(topic);
 
                 publisher(message);
@@ -172,7 +172,9 @@ describe("knockout-postbox", function(){
             });
 
             it("should not error when topic is missing", function() {
-               ko.observable().subscribeTo(null);
+                var observable = ko.observable();
+
+               expect(observable.subscribeTo.bind(observable, null)).not.toThrow();
             });
 
             describe("when initializing the value", function() {
@@ -452,18 +454,19 @@ describe("knockout-postbox", function(){
             });
 
             it("should not error when topic is missing", function() {
-                ko.observable().publishOn(null);
+                var observable = ko.observable();
+                expect(observable.publishOn.bind(observable, null)).not.toThrow();
             });
 
             describe("when not publishing initial value", function() {
                 it("should not publish initially", function() {
-                    callback.reset();
+                    callback.calls.reset();
                     observable = ko.observable(value).publishOn(topic, true);
                     expect(callback).not.toHaveBeenCalled();
                 });
 
                 it("should publish on next change", function() {
-                    callback.reset();
+                    callback.calls.reset();
                     ko.postbox.topicCache = {};
                     observable = ko.observable(value).publishOn(topic, true);
                     expect(callback).not.toHaveBeenCalled();
@@ -519,7 +522,7 @@ describe("knockout-postbox", function(){
 
                     describe("when not publishing initially", function() {
                         beforeEach(function() {
-                            callback.reset();
+                            callback.calls.reset();
                             observableWithComparer = ko.observable(value).publishOn(topic, true, lengthComparer);
                         });
 
@@ -570,7 +573,7 @@ describe("knockout-postbox", function(){
 
             describe("when not publishing initial value", function() {
                 it("should skip publishing initially", function() {
-                    callback.reset();
+                    callback.calls.reset();
                     computed = ko.computed({
                         read: underlying,
                         write: underlying
@@ -636,7 +639,7 @@ describe("knockout-postbox", function(){
 
                     describe("when not publishing initially", function() {
                         beforeEach(function() {
-                            callback.reset();
+                            callback.calls.reset();
                             underlying = ko.observable(value);
                             computedWithComparer = ko.computed({
                                 read: underlying,
@@ -681,13 +684,13 @@ describe("knockout-postbox", function(){
             });
 
             it("should publish when given a reference to the same array after it has been modified", function() {
-                callback.reset();
+                callback.calls.reset();
                 observableArray.push("extra_value");
                 expect(callback).toHaveBeenCalledWith(arrayValue);
             });
 
             it("should not publish when given a reference to the same array after it has been modified", function() {
-                callback.reset();
+                callback.calls.reset();
                 observableArray(arrayValue);
                 expect(callback).toHaveBeenCalledWith(arrayValue);
             });
@@ -750,7 +753,7 @@ describe("knockout-postbox", function(){
 
                     describe("when not publishing initially", function() {
                         beforeEach(function() {
-                            callback.reset();
+                            callback.calls.reset();
                             observableArrayWithComparer = ko.observableArray(arrayValue).publishOn(topic, true, lengthComparer);
                         });
 
@@ -786,7 +789,7 @@ describe("knockout-postbox", function(){
         it("should stop publishing after calling stopPublishingOn", function() {
             observable(newValue);
             expect(callback).toHaveBeenCalledWith(newValue);
-            callback.reset();
+            callback.calls.reset();
             observable.stopPublishingOn(topic);
 
             observable(value);
