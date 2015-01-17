@@ -53,7 +53,7 @@ one.isEditable.subscribeTo(editableTopic);
 two.editable.publishOn(editableTopic)
 ```
 
-The observable extensions accept additional arguments that can help to custom the sending/receiving behavior, as described below.
+The observable extensions accept additional arguments that can help to customize the sending/receiving behavior, as described below.
 
 Basic Usage
 -----------
