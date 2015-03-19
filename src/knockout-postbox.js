@@ -105,6 +105,16 @@
         }
     };
 
+    //provide a unsubscribeFromAll API for the postbox
+    exports.unsubscribeFromAll = function() {
+        for(var topic in this.postboxSubs) {
+
+            //clear the subscription of each element.
+            disposeTopicSubscription.call(this, topic, "subscribeTo");
+
+        }
+    };
+
     //discontinue automatically publishing on a topic
     ko.subscribable.fn.stopPublishingOn = function(topic) {
         disposeTopicSubscription.call(this, topic, "publishOn");

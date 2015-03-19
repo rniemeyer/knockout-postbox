@@ -1,5 +1,5 @@
 describe("knockout-postbox", function(){
-    var subscription, target, observable, computed, underlying, observableArray, value, newValue, arrayValue, newArrayValue, topic, callback, transform, arrayFilter;
+    var subscription, target, observable, additionalObservable, computed, underlying, observableArray, value, newValue, arrayValue, newArrayValue, topic, additionalTopic, callback, transform, arrayFilter;
 
     it("should create ko.postbox", function() {
         expect(ko.postbox).toBeDefined();
@@ -10,6 +10,7 @@ describe("knockout-postbox", function(){
         value = "test_value";
         newValue = "newer_value";
         topic = "test_topic";
+        additionalTopic = "test_topic_additional";
         arrayValue = [value];
         newArrayValue = [value, newValue];
     });
@@ -421,6 +422,25 @@ describe("knockout-postbox", function(){
             observable.unsubscribeFrom(topic);
             ko.postbox.publish(topic, value);
             expect(observable()).toEqual(newValue);
+        });
+    });
+
+    describe("unsubscribeFromAll", function() {
+        beforeEach(function() {
+            observable = ko.observable(value).subscribeTo(topic);
+            additionalObservable = ko.observable(value).subscribeTo(additionalTopic)
+        });
+
+        it("should stop receiving updates after calling unsubscribeFromAll", function() {
+            ko.postbox.publish(topic, newValue);
+            expect(observable()).toEqual(newValue);
+            expect(additionalObservable()).toEqual(newValue);
+
+            ko.postbox.unsubscribeFromAll();
+            ko.postbox.publish(topic, value);
+            ko.postbox.publish(additionalTopic, value);
+            expect(observable()).toEqual(newValue);
+            expect(additionalObservable()).toEqual(newValue);
         });
     });
 
