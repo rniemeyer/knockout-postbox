@@ -80,6 +80,14 @@ ko.postbox.subscribe("mytopic", function(newValue) {
 ko.postbox.publish("mytopic", "new value");
 ```
 
+**ko.postbox.defaultComparer**
+
+The default comparison done to determine if a value should be published simply uses `===`. At run-time you can supply your own default comparison function by overriding `ko.postbox.defaultComparer`.
+
+**ko.postbox.reset**
+
+This function disposes all subscriptions related to `ko.postbox` and clears any stored references to those subscriptions.
+
 Observable Extensions
 ---------------------
 
@@ -169,10 +177,6 @@ var comparer = function(newValue, oldValue) {
 
 this.value = ko.observable(value).syncWith("mytopic", false, false, comparer);
 ```
-
-**ko.postbox.defaultComparer**
-
-The default comparison done to determine if a value should be published simply uses `===`. At run-time you can supply your own default comparison function by overriding `ko.postbox.defaultComparer`.
 
 Dependencies
 ------------
