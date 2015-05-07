@@ -1,6 +1,6 @@
 {
     "name": "knockout-postbox",
-    "version": "0.4.2",
+    "version": "0.5.1",
     "main": "build/knockout-postbox.min.js",
     "dependencies": {
         "knockout": ">= 2.0"

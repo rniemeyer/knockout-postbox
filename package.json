@@ -1,7 +1,10 @@
 {
   "name": "knockout-postbox",
-  "version": "0.5.0",
-  "repository": "rniemeyer/knockout-postbox",
+  "version": "0.5.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/rniemeyer/knockout-postbox.git"
+  },
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-uglify": "0.x.x",
