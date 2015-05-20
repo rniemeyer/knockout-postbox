@@ -5,6 +5,7 @@
     "type": "git",
     "url": "git://github.com/rniemeyer/knockout-postbox.git"
   },
+  "main": "build/knockout-postbox.js",
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-uglify": "0.x.x",
