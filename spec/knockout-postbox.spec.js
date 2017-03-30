@@ -669,7 +669,7 @@ describe("knockout-postbox", function(){
         describe("when applied to an observableArray", function() {
             beforeEach(function() {
                 callback = jasmine.createSpy("callback");
-				arrayValue = [value];
+                arrayValue = [value];
                 ko.postbox.subscribe(topic, callback);
                 observableArray = ko.observableArray(arrayValue).publishOn(topic);
             });
@@ -680,20 +680,20 @@ describe("knockout-postbox", function(){
             });
 
             it("should publish on topic when updated", function() {
-				callback.calls.reset();
-				observableArray(newArrayValue);
+                callback.calls.reset();
+                observableArray(newArrayValue);
                 expect(callback).toHaveBeenCalledWith(newArrayValue);
             });
 
             it("should publish when given a reference to the same array after it has been modified", function() {
-				callback.calls.reset();
-				observableArray.push("extra_value");
+                callback.calls.reset();
+                observableArray.push("extra_value");
                 expect(callback).toHaveBeenCalledWith(arrayValue);
             });
 
             it("should not publish when given a reference to the same array", function() {
-				callback.calls.reset();
-				observableArray(arrayValue);
+                callback.calls.reset();
+                observableArray(arrayValue);
                 expect(callback).not.toHaveBeenCalled();
             });
 
@@ -877,14 +877,14 @@ describe("knockout-postbox", function(){
             });
 
             it("should publish on topic when updated", function() {
-				var newArray = [];
+                var newArray = [];
                 secondObservableArray(newArray);
-				expect(observableArray()).toEqual(newArray);
+                expect(observableArray()).toEqual(newArray);
 
                 observableArray.push("extra_value");
                 expect(secondObservableArray()).toEqual(newArray);
-				expect(secondObservableArray()[0]).toEqual("extra_value");
-			});
+                expect(secondObservableArray()[0]).toEqual("extra_value");
+            });
 
             describe("when initializing the value", function() {
                 it("should receive the last published value", function() {
@@ -924,106 +924,106 @@ describe("knockout-postbox", function(){
         });
     });
 
-	describe("reset", function() {
-		var directSubs = [];
-		var subscribeTos = [];
-		var publishOns = [];
-		var	noop = function() {};
-		var topicTwo = "test-topic-two";
+    describe("reset", function() {
+        var directSubs = [];
+        var subscribeTos = [];
+        var publishOns = [];
+        var    noop = function() {};
+        var topicTwo = "test-topic-two";
 
-		it("should remove subscriptions added through direct postbox calls", function() {
-			directSubs.push(ko.postbox.subscribe(topic), ko.postbox.subscribe(topic), ko.postbox.subscribe(topicTwo), ko.postbox.subscribe(topicTwo));
+        it("should remove subscriptions added through direct postbox calls", function() {
+            directSubs.push(ko.postbox.subscribe(topic), ko.postbox.subscribe(topic), ko.postbox.subscribe(topicTwo), ko.postbox.subscribe(topicTwo));
 
-			ko.utils.arrayForEach(directSubs, function(sub) {
-				spyOn(sub, "dispose").and.callThrough();
-			});
+            ko.utils.arrayForEach(directSubs, function(sub) {
+                spyOn(sub, "dispose").and.callThrough();
+            });
 
-			ko.postbox.reset();
+            ko.postbox.reset();
 
-			ko.utils.arrayForEach(directSubs, function(sub) {
-				expect(sub.dispose).toHaveBeenCalled();
-				expect(ko.postbox.subscriptions[sub.subId]).toBeUndefined();
-			});
-		});
+            ko.utils.arrayForEach(directSubs, function(sub) {
+                expect(sub.dispose).toHaveBeenCalled();
+                expect(ko.postbox.subscriptions[sub.subId]).toBeUndefined();
+            });
+        });
 
-		it("should remove subscribeTo subscriptions and pointers", function() {
-			var subscriptions;
+        it("should remove subscribeTo subscriptions and pointers", function() {
+            var subscriptions;
 
-			subscribeTos.push(ko.observable().subscribeTo(topic), ko.observable().subscribeTo(topic), ko.observable().subscribeTo(topicTwo), ko.observable().subscribeTo(topicTwo));
+            subscribeTos.push(ko.observable().subscribeTo(topic), ko.observable().subscribeTo(topic), ko.observable().subscribeTo(topicTwo), ko.observable().subscribeTo(topicTwo));
 
-			subscriptions = ko.utils.extend({}, ko.postbox.subscriptions);
+            subscriptions = ko.utils.extend({}, ko.postbox.subscriptions);
 
-			for (var id in subscriptions) {
-				if (subscriptions.hasOwnProperty(id)) {
-					spyOn(subscriptions[id], "dispose").and.callThrough();
-				}
-			}
+            for (var id in subscriptions) {
+                if (subscriptions.hasOwnProperty(id)) {
+                    spyOn(subscriptions[id], "dispose").and.callThrough();
+                }
+            }
 
-			ko.postbox.reset();
+            ko.postbox.reset();
 
-			for (var id in subscriptions) {
-				if (subscriptions.hasOwnProperty(id)) {
-					expect(subscriptions[id].dispose).toHaveBeenCalled();
-					expect(ko.postbox.subscriptions[id]).toBeUndefined();
-				}
-			}
+            for (var id in subscriptions) {
+                if (subscriptions.hasOwnProperty(id)) {
+                    expect(subscriptions[id].dispose).toHaveBeenCalled();
+                    expect(ko.postbox.subscriptions[id]).toBeUndefined();
+                }
+            }
 
-			ko.utils.arrayForEach(subscribeTos, function(observable) {
-				ko.utils.arrayForEach([topic, topicTwo], function(value) {
-					if (observable.postboxSubs[value]) {
-						expect(observable.postboxSubs[value].subscribeTo).toBeUndefined();
-					}
-				});
-			});
-		});
+            ko.utils.arrayForEach(subscribeTos, function(observable) {
+                ko.utils.arrayForEach([topic, topicTwo], function(value) {
+                    if (observable.postboxSubs[value]) {
+                        expect(observable.postboxSubs[value].subscribeTo).toBeUndefined();
+                    }
+                });
+            });
+        });
 
-		it("should remove publishTo subscriptions and pointers", function() {
-			var subscriptions = [];
+        it("should remove publishTo subscriptions and pointers", function() {
+            var subscriptions = [];
 
-			publishOns.push(ko.observable().publishOn(topic), ko.observable().publishOn(topic), ko.observable().publishOn(topicTwo), ko.observable().publishOn(topicTwo));
+            publishOns.push(ko.observable().publishOn(topic), ko.observable().publishOn(topic), ko.observable().publishOn(topicTwo), ko.observable().publishOn(topicTwo));
 
-			// gather all of the subscriptions. they are subs against the observable and not against ko.postbox
-			ko.utils.arrayForEach(publishOns, function(observable) {
-				var subs = observable.postboxSubs;
-				if (subs[topic]) {
-					subscriptions.push(observable.postboxSubs[topic].publishOn);
-				}
+            // gather all of the subscriptions. they are subs against the observable and not against ko.postbox
+            ko.utils.arrayForEach(publishOns, function(observable) {
+                var subs = observable.postboxSubs;
+                if (subs[topic]) {
+                    subscriptions.push(observable.postboxSubs[topic].publishOn);
+                }
 
-				if (subs[topicTwo]) {
-					subscriptions.push(observable.postboxSubs[topicTwo].publishOn);
-				}
-			});
+                if (subs[topicTwo]) {
+                    subscriptions.push(observable.postboxSubs[topicTwo].publishOn);
+                }
+            });
 
-			ko.utils.arrayForEach(subscriptions, function(sub) {
-				spyOn(sub, "dispose").and.callThrough();
-			});
+            ko.utils.arrayForEach(subscriptions, function(sub) {
+                spyOn(sub, "dispose").and.callThrough();
+            });
 
-			ko.postbox.reset();
+            ko.postbox.reset();
 
-			ko.utils.arrayForEach(subscriptions, function(sub) {
-				expect(sub.dispose).toHaveBeenCalled();
-				expect(ko.postbox.subscriptions[sub.subId]).toBeUndefined();
-			});
+            ko.utils.arrayForEach(subscriptions, function(sub) {
+                expect(sub.dispose).toHaveBeenCalled();
+                expect(ko.postbox.subscriptions[sub.subId]).toBeUndefined();
+            });
 
-			ko.utils.arrayForEach(publishOns, function(observable) {
-				ko.utils.arrayForEach([topic, topicTwo], function(value) {
-					if (observable.postboxSubs[value]) {
-						expect(observable.postboxSubs[value].publishOn).toBeUndefined();
-					}
-				});
-			});
-		});
+            ko.utils.arrayForEach(publishOns, function(observable) {
+                ko.utils.arrayForEach([topic, topicTwo], function(value) {
+                    if (observable.postboxSubs[value]) {
+                        expect(observable.postboxSubs[value].publishOn).toBeUndefined();
+                    }
+                });
+            });
+        });
 
-		it("should reset the topicCache", function() {
-			ko.postbox.subscribe(topic, noop);
-			ko.postbox.subscribe(topicTwo, noop);
+        it("should reset the topicCache", function() {
+            ko.postbox.subscribe(topic, noop);
+            ko.postbox.subscribe(topicTwo, noop);
 
-			ko.postbox.publish(topic, value);
-			ko.postbox.publish(topicTwo, newValue);
+            ko.postbox.publish(topic, value);
+            ko.postbox.publish(topicTwo, newValue);
 
-			ko.postbox.reset();
+            ko.postbox.reset();
 
-			expect(Object.keys(ko.postbox.topicCache).length).toEqual(0);
-		});
-	});
+            expect(Object.keys(ko.postbox.topicCache).length).toEqual(0);
+        });
+    });
 });
