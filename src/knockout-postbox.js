@@ -95,7 +95,8 @@
     // Ensures that a `subscribable` has a `dispose` method which cleans up all
     // subscriptions added by `knockout-postbox`.
     ensureDispose = function() {
-        var self = this;
+        var existingDispose,
+            self = this;
 
         // Make sure we're adding the custom `dispose` method at most once.
         if (!self.willDisposePostbox) {
