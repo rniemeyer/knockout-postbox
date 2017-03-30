@@ -8,7 +8,8 @@
   "main": "build/knockout-postbox.js",
   "scripts": {
       "test": "grunt jasmine",
-      "watch": "grunt watch"
+      "watch": "grunt watch",
+      "build": "grunt"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

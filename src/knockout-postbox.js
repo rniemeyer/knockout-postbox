@@ -217,5 +217,11 @@
         return this;
     };
 
+    ko.subscribable.fn.stopSyncingWith = function(topic) {
+        this.unsubscribeFrom(topic).stopPublishingOn(topic);
+
+        return this;
+    };
+
     ko.postbox = exports;
 }));

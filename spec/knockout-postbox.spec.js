@@ -896,6 +896,34 @@ describe("knockout-postbox", function(){
         });
     });
 
+    describe("stopSyncingWith", function() {
+        beforeEach(function() {
+            observable = ko.observable(value).syncWith(topic);
+            callback = jasmine.createSpy("callback");
+            subscription = ko.postbox.subscribe(topic, callback);
+        });
+
+        it("should stop receiving updates after calling stopSyncingWith", function() {
+            ko.postbox.publish(topic, newValue);
+            expect(observable()).toEqual(newValue);
+
+            observable.stopSyncingWith(topic);
+            ko.postbox.publish(topic, value);
+            expect(observable()).toEqual(newValue);
+        });
+
+        it("should stop publishing after calling stopSyncingWith", function() {
+            observable(newValue);
+            expect(callback).toHaveBeenCalledWith(newValue);
+            callback.calls.reset();
+            observable.stopSyncingWith(topic);
+
+            observable(value);
+
+            expect(callback).not.toHaveBeenCalled();
+        });
+    });
+
 	describe("reset", function() {
 		var directSubs = [];
 		var subscribeTos = [];

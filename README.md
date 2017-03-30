@@ -178,6 +178,14 @@ var comparer = function(newValue, oldValue) {
 this.value = ko.observable(value).syncWith("mytopic", false, false, comparer);
 ```
 
+**stopSyncingWith** *- stopSyncingWith(topic)*
+
+The `stopSyncingWith` function removes the subscription that an observable has on a topic as well as the subscription used to automatically publish changes to the observable.
+
+```js
+this.value.stopSyncingWith("mytopic");
+```
+
 Dependencies
 ------------
 * Knockout 2.0+
