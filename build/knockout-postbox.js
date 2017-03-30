@@ -1,4 +1,4 @@
-// knockout-postbox 0.5.2 | (c) 2017 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
+// knockout-postbox 0.5.3 | (c) 2017 Ryan Niemeyer |  http://www.opensource.org/licenses/mit-license
 ;(function(factory) {
     //CommonJS
     if (typeof require === "function" && typeof exports === "object" && typeof module === "object") {
