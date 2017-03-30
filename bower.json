@@ -1,6 +1,5 @@
 {
     "name": "knockout-postbox",
-    "version": "0.5.2",
     "main": "build/knockout-postbox.min.js",
     "dependencies": {
         "knockout": ">= 2.0"
@@ -16,6 +15,7 @@
         "src",
         "Gruntfile.js",
         "package.json",
-        ".gitignore"
+        ".gitignore",
+        ".editorconfig"
     ]
 }

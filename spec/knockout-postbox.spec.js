@@ -669,7 +669,7 @@ describe("knockout-postbox", function(){
         describe("when applied to an observableArray", function() {
             beforeEach(function() {
                 callback = jasmine.createSpy("callback");
-				arrayValue = [value];
+                arrayValue = [value];
                 ko.postbox.subscribe(topic, callback);
                 observableArray = ko.observableArray(arrayValue).publishOn(topic);
             });
@@ -680,20 +680,20 @@ describe("knockout-postbox", function(){
             });
 
             it("should publish on topic when updated", function() {
-				callback.calls.reset();
-				observableArray(newArrayValue);
+                callback.calls.reset();
+                observableArray(newArrayValue);
                 expect(callback).toHaveBeenCalledWith(newArrayValue);
             });
 
             it("should publish when given a reference to the same array after it has been modified", function() {
-				callback.calls.reset();
-				observableArray.push("extra_value");
+                callback.calls.reset();
+                observableArray.push("extra_value");
                 expect(callback).toHaveBeenCalledWith(arrayValue);
             });
 
             it("should not publish when given a reference to the same array", function() {
-				callback.calls.reset();
-				observableArray(arrayValue);
+                callback.calls.reset();
+                observableArray(arrayValue);
                 expect(callback).not.toHaveBeenCalled();
             });
 
@@ -877,14 +877,14 @@ describe("knockout-postbox", function(){
             });
 
             it("should publish on topic when updated", function() {
-				var newArray = [];
+                var newArray = [];
                 secondObservableArray(newArray);
-				expect(observableArray()).toEqual(newArray);
+                expect(observableArray()).toEqual(newArray);
 
                 observableArray.push("extra_value");
                 expect(secondObservableArray()).toEqual(newArray);
-				expect(secondObservableArray()[0]).toEqual("extra_value");
-			});
+                expect(secondObservableArray()[0]).toEqual("extra_value");
+            });
 
             describe("when initializing the value", function() {
                 it("should receive the last published value", function() {
@@ -896,106 +896,228 @@ describe("knockout-postbox", function(){
         });
     });
 
-	describe("reset", function() {
-		var directSubs = [];
-		var subscribeTos = [];
-		var publishOns = [];
-		var	noop = function() {};
-		var topicTwo = "test-topic-two";
+    describe("stopSyncingWith", function() {
+        beforeEach(function() {
+            observable = ko.observable(value).syncWith(topic);
+            callback = jasmine.createSpy("callback");
+            subscription = ko.postbox.subscribe(topic, callback);
+        });
 
-		it("should remove subscriptions added through direct postbox calls", function() {
-			directSubs.push(ko.postbox.subscribe(topic), ko.postbox.subscribe(topic), ko.postbox.subscribe(topicTwo), ko.postbox.subscribe(topicTwo));
+        it("should stop receiving updates after calling stopSyncingWith", function() {
+            ko.postbox.publish(topic, newValue);
+            expect(observable()).toEqual(newValue);
 
-			ko.utils.arrayForEach(directSubs, function(sub) {
-				spyOn(sub, "dispose").and.callThrough();
-			});
+            observable.stopSyncingWith(topic);
+            ko.postbox.publish(topic, value);
+            expect(observable()).toEqual(newValue);
+        });
 
-			ko.postbox.reset();
+        it("should stop publishing after calling stopSyncingWith", function() {
+            observable(newValue);
+            expect(callback).toHaveBeenCalledWith(newValue);
+            callback.calls.reset();
+            observable.stopSyncingWith(topic);
 
-			ko.utils.arrayForEach(directSubs, function(sub) {
-				expect(sub.dispose).toHaveBeenCalled();
-				expect(ko.postbox.subscriptions[sub.subId]).toBeUndefined();
-			});
-		});
+            observable(value);
 
-		it("should remove subscribeTo subscriptions and pointers", function() {
-			var subscriptions;
+            expect(callback).not.toHaveBeenCalled();
+        });
+    });
 
-			subscribeTos.push(ko.observable().subscribeTo(topic), ko.observable().subscribeTo(topic), ko.observable().subscribeTo(topicTwo), ko.observable().subscribeTo(topicTwo));
+    describe("dispose", function () {
+        describe("when called on an observable", function() {
+            beforeEach(function() {
+                observable = ko.observable(value).syncWith(topic);
+                callback = jasmine.createSpy("callback");
+                subscription = ko.postbox.subscribe(topic, callback);
+            });
 
-			subscriptions = ko.utils.extend({}, ko.postbox.subscriptions);
+            it("should stop receiving updates after calling dispose", function() {
+                ko.postbox.publish(topic, newValue);
+                expect(observable()).toEqual(newValue);
 
-			for (var id in subscriptions) {
-				if (subscriptions.hasOwnProperty(id)) {
-					spyOn(subscriptions[id], "dispose").and.callThrough();
-				}
-			}
+                observable.dispose();
+                ko.postbox.publish(topic, value);
+                expect(observable()).toEqual(newValue);
+            });
 
-			ko.postbox.reset();
+            it("should stop publishing after calling dispose", function() {
+                observable(newValue);
+                expect(callback).toHaveBeenCalledWith(newValue);
+                callback.calls.reset();
+                observable.dispose();
 
-			for (var id in subscriptions) {
-				if (subscriptions.hasOwnProperty(id)) {
-					expect(subscriptions[id].dispose).toHaveBeenCalled();
-					expect(ko.postbox.subscriptions[id]).toBeUndefined();
-				}
-			}
+                observable(value);
+                expect(callback).not.toHaveBeenCalled();
+            });
 
-			ko.utils.arrayForEach(subscribeTos, function(observable) {
-				ko.utils.arrayForEach([topic, topicTwo], function(value) {
-					if (observable.postboxSubs[value]) {
-						expect(observable.postboxSubs[value].subscribeTo).toBeUndefined();
-					}
-				});
-			});
-		});
+            it("should be safe to call more than once", function () {
+                expect(function() {
+                    observable.dispose()
+                    observable.dispose()
+                }).not.toThrow();
+            });
+        });
 
-		it("should remove publishTo subscriptions and pointers", function() {
-			var subscriptions = [];
+        describe("when called on a computed observable", function() {
+            var existingDisposeSpy;
 
-			publishOns.push(ko.observable().publishOn(topic), ko.observable().publishOn(topic), ko.observable().publishOn(topicTwo), ko.observable().publishOn(topicTwo));
+            beforeEach(function() {
+                callback = jasmine.createSpy("callback");
+                subscription = ko.postbox.subscribe(topic, callback);
 
-			// gather all of the subscriptions. they are subs against the observable and not against ko.postbox
-			ko.utils.arrayForEach(publishOns, function(observable) {
-				var subs = observable.postboxSubs;
-				if (subs[topic]) {
-					subscriptions.push(observable.postboxSubs[topic].publishOn);
-				}
+                underlying = ko.observable(value); //computed references this observable
+                computed = ko.computed({ //writeable computed observable
+                    read: underlying,
+                    write: underlying
+                });
+                spyOn(computed, "dispose").and.callThrough();
+                existingDisposeSpy = computed.dispose;
+                computed.syncWith(topic);
+            });
 
-				if (subs[topicTwo]) {
-					subscriptions.push(observable.postboxSubs[topicTwo].publishOn);
-				}
-			});
+            it("should stop receiving updates after calling dispose", function() {
+                ko.postbox.publish(topic, newValue);
+                expect(underlying()).toEqual(newValue);
 
-			ko.utils.arrayForEach(subscriptions, function(sub) {
-				spyOn(sub, "dispose").and.callThrough();
-			});
+                expect(computed.postboxSubs[topic].subscribeTo).toBeDefined();
+                expect(computed.postboxSubs[topic].publishOn).toBeDefined();
+                expect(existingDisposeSpy).not.toHaveBeenCalled();
+                computed.dispose();
+                expect(existingDisposeSpy).toHaveBeenCalled();
+                expect(computed.postboxSubs[topic].subscribeTo).toBeUndefined();
+                expect(computed.postboxSubs[topic].publishOn).toBeUndefined();
 
-			ko.postbox.reset();
+                ko.postbox.publish(topic, value);
+                expect(underlying()).toEqual(newValue);
+            });
 
-			ko.utils.arrayForEach(subscriptions, function(sub) {
-				expect(sub.dispose).toHaveBeenCalled();
-				expect(ko.postbox.subscriptions[sub.subId]).toBeUndefined();
-			});
+            it("should stop publishing after calling dispose", function() {
+                underlying(newValue);
+                expect(callback).toHaveBeenCalledWith(newValue);
+                callback.calls.reset();
 
-			ko.utils.arrayForEach(publishOns, function(observable) {
-				ko.utils.arrayForEach([topic, topicTwo], function(value) {
-					if (observable.postboxSubs[value]) {
-						expect(observable.postboxSubs[value].publishOn).toBeUndefined();
-					}
-				});
-			});
-		});
+                expect(computed.postboxSubs[topic].subscribeTo).toBeDefined();
+                expect(computed.postboxSubs[topic].publishOn).toBeDefined();
+                expect(existingDisposeSpy).not.toHaveBeenCalled();
+                computed.dispose();
+                expect(existingDisposeSpy).toHaveBeenCalled();
+                expect(computed.postboxSubs[topic].subscribeTo).toBeUndefined();
+                expect(computed.postboxSubs[topic].publishOn).toBeUndefined();
 
-		it("should reset the topicCache", function() {
-			ko.postbox.subscribe(topic, noop);
-			ko.postbox.subscribe(topicTwo, noop);
+                underlying(value);
+                expect(callback).not.toHaveBeenCalled();
+            });
 
-			ko.postbox.publish(topic, value);
-			ko.postbox.publish(topicTwo, newValue);
+            it("should be safe to call more than once", function () {
+                expect(function() {
+                    computed.dispose()
+                    computed.dispose()
+                }).not.toThrow();
+            });
+        });
+    });
 
-			ko.postbox.reset();
+    describe("reset", function() {
+        var directSubs = [];
+        var subscribeTos = [];
+        var publishOns = [];
+        var    noop = function() {};
+        var topicTwo = "test-topic-two";
 
-			expect(Object.keys(ko.postbox.topicCache).length).toEqual(0);
-		});
-	});
+        it("should remove subscriptions added through direct postbox calls", function() {
+            directSubs.push(ko.postbox.subscribe(topic), ko.postbox.subscribe(topic), ko.postbox.subscribe(topicTwo), ko.postbox.subscribe(topicTwo));
+
+            ko.utils.arrayForEach(directSubs, function(sub) {
+                spyOn(sub, "dispose").and.callThrough();
+            });
+
+            ko.postbox.reset();
+
+            ko.utils.arrayForEach(directSubs, function(sub) {
+                expect(sub.dispose).toHaveBeenCalled();
+                expect(ko.postbox.subscriptions[sub.subId]).toBeUndefined();
+            });
+        });
+
+        it("should remove subscribeTo subscriptions and pointers", function() {
+            var subscriptions;
+
+            subscribeTos.push(ko.observable().subscribeTo(topic), ko.observable().subscribeTo(topic), ko.observable().subscribeTo(topicTwo), ko.observable().subscribeTo(topicTwo));
+
+            subscriptions = ko.utils.extend({}, ko.postbox.subscriptions);
+
+            for (var id in subscriptions) {
+                if (subscriptions.hasOwnProperty(id)) {
+                    spyOn(subscriptions[id], "dispose").and.callThrough();
+                }
+            }
+
+            ko.postbox.reset();
+
+            for (var id in subscriptions) {
+                if (subscriptions.hasOwnProperty(id)) {
+                    expect(subscriptions[id].dispose).toHaveBeenCalled();
+                    expect(ko.postbox.subscriptions[id]).toBeUndefined();
+                }
+            }
+
+            ko.utils.arrayForEach(subscribeTos, function(observable) {
+                ko.utils.arrayForEach([topic, topicTwo], function(value) {
+                    if (observable.postboxSubs[value]) {
+                        expect(observable.postboxSubs[value].subscribeTo).toBeUndefined();
+                    }
+                });
+            });
+        });
+
+        it("should remove publishTo subscriptions and pointers", function() {
+            var subscriptions = [];
+
+            publishOns.push(ko.observable().publishOn(topic), ko.observable().publishOn(topic), ko.observable().publishOn(topicTwo), ko.observable().publishOn(topicTwo));
+
+            // gather all of the subscriptions. they are subs against the observable and not against ko.postbox
+            ko.utils.arrayForEach(publishOns, function(observable) {
+                var subs = observable.postboxSubs;
+                if (subs[topic]) {
+                    subscriptions.push(observable.postboxSubs[topic].publishOn);
+                }
+
+                if (subs[topicTwo]) {
+                    subscriptions.push(observable.postboxSubs[topicTwo].publishOn);
+                }
+            });
+
+            ko.utils.arrayForEach(subscriptions, function(sub) {
+                spyOn(sub, "dispose").and.callThrough();
+            });
+
+            ko.postbox.reset();
+
+            ko.utils.arrayForEach(subscriptions, function(sub) {
+                expect(sub.dispose).toHaveBeenCalled();
+                expect(ko.postbox.subscriptions[sub.subId]).toBeUndefined();
+            });
+
+            ko.utils.arrayForEach(publishOns, function(observable) {
+                ko.utils.arrayForEach([topic, topicTwo], function(value) {
+                    if (observable.postboxSubs[value]) {
+                        expect(observable.postboxSubs[value].publishOn).toBeUndefined();
+                    }
+                });
+            });
+        });
+
+        it("should reset the topicCache", function() {
+            ko.postbox.subscribe(topic, noop);
+            ko.postbox.subscribe(topicTwo, noop);
+
+            ko.postbox.publish(topic, value);
+            ko.postbox.publish(topicTwo, newValue);
+
+            ko.postbox.reset();
+
+            expect(Object.keys(ko.postbox.topicCache).length).toEqual(0);
+        });
+    });
 });

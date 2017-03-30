@@ -1,18 +1,24 @@
 {
   "name": "knockout-postbox",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/rniemeyer/knockout-postbox.git"
   },
   "main": "build/knockout-postbox.js",
+  "scripts": {
+      "test": "grunt jasmine",
+      "watch": "grunt watch",
+      "build": "grunt"
+  },
   "devDependencies": {
     "grunt": "~0.4.1",
-    "grunt-contrib-uglify": "0.x.x",
-    "grunt-contrib-jshint": "0.x.x",
-    "grunt-contrib-watch": "0.x.x",
+    "grunt-cli": "^1.2.0",
     "grunt-contrib-concat": "0.x.x",
     "grunt-contrib-jasmine": "0.x.x",
-    "grunt-template-jasmine-istanbul": "0.x.x"
+    "grunt-contrib-jshint": "0.x.x",
+    "grunt-contrib-uglify": "0.x.x",
+    "grunt-contrib-watch": "0.x.x",
+    "grunt-template-jasmine-istanbul": "^0.4.0"
   }
 }
