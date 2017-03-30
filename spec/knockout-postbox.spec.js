@@ -924,6 +924,100 @@ describe("knockout-postbox", function(){
         });
     });
 
+    describe("dispose", function () {
+        describe("when called on an observable", function() {
+            beforeEach(function() {
+                observable = ko.observable(value).syncWith(topic);
+                callback = jasmine.createSpy("callback");
+                subscription = ko.postbox.subscribe(topic, callback);
+            });
+
+            it("should stop receiving updates after calling dispose", function() {
+                ko.postbox.publish(topic, newValue);
+                expect(observable()).toEqual(newValue);
+
+                observable.dispose();
+                ko.postbox.publish(topic, value);
+                expect(observable()).toEqual(newValue);
+            });
+
+            it("should stop publishing after calling dispose", function() {
+                observable(newValue);
+                expect(callback).toHaveBeenCalledWith(newValue);
+                callback.calls.reset();
+                observable.dispose();
+
+                observable(value);
+                expect(callback).not.toHaveBeenCalled();
+            });
+
+            it("should be safe to call more than once", function () {
+                expect(function() {
+                    observable.dispose()
+                    observable.dispose()
+                }).not.toThrow();
+            });
+        });
+
+        describe("when called on a computed observable", function() {
+            var existingDisposeSpy;
+
+            beforeEach(function() {
+                callback = jasmine.createSpy("callback");
+                subscription = ko.postbox.subscribe(topic, callback);
+
+                underlying = ko.observable(value); //computed references this observable
+                computed = ko.computed({ //writeable computed observable
+                    read: underlying,
+                    write: underlying
+                });
+                spyOn(computed, "dispose").and.callThrough();
+                existingDisposeSpy = computed.dispose;
+                computed.syncWith(topic);
+            });
+
+            it("should stop receiving updates after calling dispose", function() {
+                ko.postbox.publish(topic, newValue);
+                expect(underlying()).toEqual(newValue);
+
+                expect(computed.postboxSubs[topic].subscribeTo).toBeDefined();
+                expect(computed.postboxSubs[topic].publishOn).toBeDefined();
+                expect(existingDisposeSpy).not.toHaveBeenCalled();
+                computed.dispose();
+                expect(existingDisposeSpy).toHaveBeenCalled();
+                expect(computed.postboxSubs[topic].subscribeTo).toBeUndefined();
+                expect(computed.postboxSubs[topic].publishOn).toBeUndefined();
+
+                ko.postbox.publish(topic, value);
+                expect(underlying()).toEqual(newValue);
+            });
+
+            it("should stop publishing after calling dispose", function() {
+                underlying(newValue);
+                expect(callback).toHaveBeenCalledWith(newValue);
+                callback.calls.reset();
+
+                expect(computed.postboxSubs[topic].subscribeTo).toBeDefined();
+                expect(computed.postboxSubs[topic].publishOn).toBeDefined();
+                expect(existingDisposeSpy).not.toHaveBeenCalled();
+                computed.dispose();
+                expect(existingDisposeSpy).toHaveBeenCalled();
+                expect(computed.postboxSubs[topic].subscribeTo).toBeUndefined();
+                expect(computed.postboxSubs[topic].publishOn).toBeUndefined();
+
+                underlying(value);
+                expect(callback).not.toHaveBeenCalled();
+            });
+
+            it("should be safe to call more than once", function () {
+                expect(function() {
+                    computed.dispose()
+                    computed.dispose()
+                }).not.toThrow();
+            });
+        });
+    });
+
     describe("reset", function() {
         var directSubs = [];
         var subscribeTos = [];

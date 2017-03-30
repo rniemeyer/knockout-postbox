@@ -186,6 +186,16 @@ The `stopSyncingWith` function removes the subscription that an observable has o
 this.value.stopSyncingWith("mytopic");
 ```
 
+**dispose** *- dispose()*
+
+The `dispose` function removes all the subscriptions that an observable has on any topic as well as all the subscriptions used to automatically publish changes to the observable.
+
+This function is attached to the observable when `publishOn`, `subscribeTo` or `syncWith` is called. If the observable already has a pre-existinig `dispose` function, then it is automatically called in addition to performing the clean-up steps mentioned above.
+
+```js
+this.value.dispose();
+```
+
 Dependencies
 ------------
 * Knockout 2.0+

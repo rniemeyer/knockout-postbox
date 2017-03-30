@@ -10,7 +10,7 @@
         factory(ko, ko.postbox = {});
     }
 }(function(ko, exports, undefined) {
-    var disposeTopicSubscription, existingSubscribe,
+    var disposeTopicSubscription, ensureDispose, existingSubscribe,
         subscriptions = {},
         subId = 1;
 
@@ -92,9 +92,50 @@
         return cacheItem && exports.serializer(newValue) === cacheItem.serialized;
     };
 
+    // Ensures that a `subscribable` has a `dispose` method which cleans up all
+    // subscriptions added by `knockout-postbox`.
+    ensureDispose = function() {
+        var self = this;
+
+        // Make sure we're adding the custom `dispose` method at most once.
+        if (!self.willDisposePostbox) {
+            self.willDisposePostbox = true;
+
+            existingDispose = self.dispose;
+            self.dispose = function() {
+                var topic, types, type, sub,
+                    subs = self.postboxSubs;
+
+                if (subs) {
+                    for (topic in subs) {
+                        if (subs.hasOwnProperty(topic)) {
+                            types = subs[topic];
+                            if (types) {
+                                for (type in types) {
+                                    if (types.hasOwnProperty(type)) {
+                                        sub = types[type];
+                                        if (sub && typeof sub.dispose == 'function') {
+                                            sub.dispose();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (existingDispose) {
+                    existingDispose.call(self);
+                }
+            };
+        }
+    };
+
     //augment observables/computeds with the ability to automatically publish updates on a topic
     ko.subscribable.fn.publishOn = function(topic, skipInitialOrEqualityComparer, equalityComparer) {
         var skipInitialPublish, subscription, existingDispose;
+
+        ensureDispose.call(this);
 
         if (topic) {
             //allow passing the equalityComparer as the second argument
@@ -161,6 +202,8 @@
     ko.subscribable.fn.subscribeTo = function(topic, initializeWithLatestValueOrTransform, transform) {
         var initializeWithLatestValue, current, callback, subscription, existingDispose,
             self = this;
+
+        ensureDispose.call(this);
 
         //allow passing the filter as the second argument
         if (typeof initializeWithLatestValueOrTransform === "function") {
