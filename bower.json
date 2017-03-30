@@ -16,6 +16,7 @@
         "src",
         "Gruntfile.js",
         "package.json",
-        ".gitignore"
+        ".gitignore",
+        ".editorconfig"
     ]
 }
