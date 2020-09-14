@@ -25,9 +25,11 @@ var ViewModelThree = function() {
 //a non-KO component can also participate in this communication
 var SomeOtherComponent = function() {
   //subscribe directly to the topic
-  ko.postbox.subscribe("myEditableTopic", function(newValue) {
+  var subscription = ko.postbox.subscribe("myEditableTopic", function(newValue) {
      //do something with newValue
   }); 
+  
+  //in a disposal function, can call subscription.dispose();
   
   //publish on the topic
   ko.postbox.publish("myEditableTopic", "some new value");
@@ -63,14 +65,19 @@ Basic Usage
 **subscribe** *- ko.postbox.subscribe(topic, handler, [target], [initializeWithLatestValue])*
 
 ```js
-ko.postbox.subscribe("mytopic", function(newValue) {
+var subscription = ko.postbox.subscribe("mytopic", function(newValue) {
     console.log("Value: " + newValue);
 }, viewModel);
 
 //receive updates from "mytopic", initialize with latest published value
-ko.postbox.subscribe("mytopic", function(newValue) {
+var subscription = ko.postbox.subscribe("mytopic", function(newValue) {
     console.log("Value: " + newValue);
 }, viewModel, true);
+
+//in a disposal function, can call subscription.dispose() to clean-up the subscription
+cleanup() {
+    subscription.dispose();
+}
 ```
 
 
