@@ -181,7 +181,17 @@
 
         return this;
     };
-
+    //dispose all subscriptions by topic name.
+    exports.disposeTopic = function (topic) {
+        var sub = subscriptions[topic];
+        if (sub) {
+            for (var i in sub)
+            {
+                sub[i].dispose();
+            }
+            delete subscriptions[topic];
+        }
+    };
     //handle disposing a subscription used to publish or subscribe to a topic
     disposeTopicSubscription = function(topic, type) {
         var subs = this.postboxSubs = this.postboxSubs || {};
